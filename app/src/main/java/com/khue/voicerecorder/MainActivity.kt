@@ -59,27 +59,23 @@ class MainActivity : ComponentActivity() {
                     Column {
                         Button(onClick = {
                             scope.launch(Dispatchers.IO) {
-                                try {
-                                    recorder.start()
-                                    var read: Int
-                                    val data = ByteArray(16384)
+                                recorder.start()
+                                var read: Int
+                                val data = ByteArray(16384)
 
-                                    var count = 0
+                                var count = 0
 
-                                    while (inputStream.read(data, 0, data.size)
-                                            .also {
-                                                read = it
-                                                Log.d("AudioRecorder", "read $it")
-                                            } != -1
-                                    ) {
-                                        byteArrayOutputStream.write(data, 0, read)
-                                        Log.d("AudioRecorder", "record count ${count++}")
-                                    }
-                                    Log.d("AudioRecorder", "record stop")
-                                    byteArrayOutputStream.flush()
-                                } catch (e: Exception) {
-                                    Log.e("AudioRecorder", "record error ${e.message}")
+                                while (inputStream.read(data, 0, data.size)
+                                        .also {
+                                            read = it
+                                            Log.d("AudioRecorder", "read $it")
+                                        } != -1
+                                ) {
+                                    byteArrayOutputStream.write(data, 0, read)
+                                    Log.d("AudioRecorder", "record count ${count++}")
                                 }
+                                Log.d("AudioRecorder", "record stop")
+                                byteArrayOutputStream.flush()
                             }
                         }) {
                             Text("Start")
@@ -89,6 +85,8 @@ class MainActivity : ComponentActivity() {
                                 recorder.stop()
                                 recorder.reset()
                                 recorder.release()
+                                byteArrayOutputStream.close()
+                                parcelWrite.close()
                                 Log.d("AudioRecorder", "record : ${byteArrayOutputStream.toByteArray().size}")
                             }
                         }) {
